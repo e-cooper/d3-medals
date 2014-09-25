@@ -71,7 +71,71 @@ function draw_bar_chart() {
                 .attr("width", x1.rangeBand())
                 .attr("x", function(d) { return x1(d.name); })
                 .attr("y", function(d) { return y(d.value); })
-                .attr("height", function(d) { return height - y(d.value); });
+                .attr("height", function(d) { return height - y(d.value); })
+                .on("mouseover", function(d){
+                    return tooltip.style("visibility", "visible").text(d.value); 
+                })
+                .on("mousemove", function(d){ 
+                    return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px").text(d.value); 
+                })
+                .on("mouseout", function(d){ 
+                    return tooltip.style("visibility", "hidden"); 
+                });
+
+        var legend = svg.selectAll(".legend")
+                        .data(medalCounts.slice())
+                        .enter().append("g")
+                        .attr("class", "legend")
+                        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                    legend.append("rect")
+                        .attr("x", width - 18)
+                        .attr("width", 18)
+                        .attr("height", 18)
+                        .attr("class", function(d, i) { return medalCounts[i]; });
+
+                    legend.append("text")
+                        .attr("x", width - 24)
+                        .attr("y", 9)
+                        .attr("dy", ".35em")
+                        .style("text-anchor", "end")
+                        .text(function(d) { return d; });
+
+        d3.selectAll("input").on("change", check);
+
+        function check() {
+        
+            var value = this.value;
+
+            if (value === "gold") {
+                d3.selectAll("g.g rect.Gold")
+                    .classed("none", !this.checked)
+                    .on("mouseover", this.checked ? function(d){
+                        return tooltip.style("visibility", "visible").text(d.value); 
+                    } : null);
+            }
+            else if (value === "silver") {
+                d3.selectAll("g.g rect.Silver")
+                    .classed("none", !this.checked)
+                    .on("mouseover", this.checked ? function(d){
+                        return tooltip.style("visibility", "visible").text(d.value); 
+                    } : null);
+            }
+            else if (value === "bronze") {
+                d3.selectAll("g.g rect.Bronze")
+                    .classed("none", !this.checked)
+                    .on("mouseover", this.checked ? function(d){
+                        return tooltip.style("visibility", "visible").text(d.value); 
+                    } : null);
+            }
+            else if (value === "total") {
+                d3.selectAll("g.g rect.Total")
+                    .classed("none", !this.checked)
+                    .on("mouseover", this.checked ? function(d){
+                        return tooltip.style("visibility", "visible").text(d.value); 
+                    } : null);
+            }
+        }
 
         d3.select("#dropdown").on("change", change);
 
@@ -105,5 +169,13 @@ function draw_bar_chart() {
                 .selectAll("g")
                 .delay(delay);
         }   
+
+        var tooltip = d3.select("body")
+                        .append("div")
+                        .attr("class", "tooltip")
+                        .style("position", "absolute")
+                        .style("z-index", "10")
+                        .style("visibility", "hidden")
+                        .text("a simple tooltip");
     });
 }
